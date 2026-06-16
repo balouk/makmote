@@ -1,0 +1,8 @@
+[
+  { "id": "crown", "name": "Crown", "category": "Headwear", "src": "/stickers/crown.svg" },
+  { "id": "party-hat", "name": "Party hat", "category": "Headwear", "src": "/stickers/party-hat.svg" },
+  { "id": "cowboy-hat", "name": "Cowboy hat", "category": "Headwear", "src": "/stickers/cowboy-hat.svg" },
+  { "id": "sunglasses", "name": "Sunglasses", "category": "Face", "src": "/stickers/sunglasses.svg" },
+  { "id": "mustache", "name": "Mustache", "category": "Face", "src": "/stickers/mustache.svg" },
+  { "id": "speech-bubble", "name": "Speech bubble", "category": "Props", "src": "/stickers/speech-bubble.svg" }
+]
