@@ -2,7 +2,17 @@
   { "id": "crown", "name": "Crown", "category": "Headwear", "src": "/stickers/crown.svg" },
   { "id": "party-hat", "name": "Party hat", "category": "Headwear", "src": "/stickers/party-hat.svg" },
   { "id": "cowboy-hat", "name": "Cowboy hat", "category": "Headwear", "src": "/stickers/cowboy-hat.svg" },
+  { "id": "top-hat", "name": "Top hat", "category": "Headwear", "src": "/stickers/top-hat.svg" },
+  { "id": "flower-crown", "name": "Flower crown", "category": "Headwear", "src": "/stickers/flower-crown.svg" },
+  { "id": "halo", "name": "Halo", "category": "Headwear", "src": "/stickers/halo.svg" },
+  { "id": "devil-horns", "name": "Devil horns", "category": "Headwear", "src": "/stickers/devil-horns.svg" },
   { "id": "sunglasses", "name": "Sunglasses", "category": "Face", "src": "/stickers/sunglasses.svg" },
   { "id": "mustache", "name": "Mustache", "category": "Face", "src": "/stickers/mustache.svg" },
-  { "id": "speech-bubble", "name": "Speech bubble", "category": "Props", "src": "/stickers/speech-bubble.svg" }
+  { "id": "monocle", "name": "Monocle", "category": "Face", "src": "/stickers/monocle.svg" },
+  { "id": "eyepatch", "name": "Eyepatch", "category": "Face", "src": "/stickers/eyepatch.svg" },
+  { "id": "clown-nose", "name": "Clown nose", "category": "Face", "src": "/stickers/clown-nose.svg" },
+  { "id": "speech-bubble", "name": "Speech bubble", "category": "Props", "src": "/stickers/speech-bubble.svg" },
+  { "id": "gold-chain", "name": "Gold chain", "category": "Props", "src": "/stickers/gold-chain.svg" },
+  { "id": "sparkles", "name": "Sparkles", "category": "Effects", "src": "/stickers/sparkles.svg" },
+  { "id": "lightning", "name": "Lightning", "category": "Effects", "src": "/stickers/lightning.svg" }
 ]
