@@ -6,7 +6,7 @@
   { "id": "flower-crown", "name": "Flower crown", "category": "Headwear", "src": "/stickers/flower-crown.svg" },
   { "id": "halo", "name": "Halo", "category": "Headwear", "src": "/stickers/halo.svg" },
   { "id": "devil-horns", "name": "Devil horns", "category": "Headwear", "src": "/stickers/devil-horns.svg" },
-  { "id": "police-light", "name": "Police light", "category": "Headwear", "src": "/stickers/police-light.svg" },
+  { "id": "police-light", "name": "Gyrophare", "category": "Headwear", "src": "/stickers/police-light.svg" },
   { "id": "unicorn-horn", "name": "Unicorn horn", "category": "Headwear", "src": "/stickers/unicorn-horn.svg" },
   { "id": "cat-ears", "name": "Cat ears", "category": "Headwear", "src": "/stickers/cat-ears.svg" },
   { "id": "sunglasses", "name": "Sunglasses", "category": "Face", "src": "/stickers/sunglasses.svg" },
