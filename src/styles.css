@@ -199,6 +199,53 @@ body {
   max-height: 100%;
 }
 
+/* Photo library */
+.photo-cell {
+  position: relative;
+  aspect-ratio: 1;
+}
+/* a sticker thumb nested in a photo-cell (removable upload) fills the slot */
+.photo-cell .sticker-cell {
+  width: 100%;
+  height: 100%;
+}
+.photo-thumb {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--panel);
+}
+.photo-thumb:hover {
+  border-color: var(--accent);
+}
+.photo-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.photo-remove {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  background: var(--danger);
+  color: #fff;
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Workspace */
 .workspace {
   flex: 1;

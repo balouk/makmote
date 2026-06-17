@@ -3,8 +3,9 @@ import { useEditor } from "../store/editorStore";
 import { readImageFile } from "../lib/file";
 import { EmojiPicker } from "./EmojiPicker";
 import { StickerPicker } from "./StickerPicker";
+import { PhotoLibrary } from "./PhotoLibrary";
 
-type Popover = "emoji" | "sticker" | null;
+type Popover = "emoji" | "sticker" | "photos" | null;
 
 export function Toolbar() {
   const setBaseImage = useEditor((s) => s.setBaseImage);
@@ -13,6 +14,7 @@ export function Toolbar() {
   const addText = useEditor((s) => s.addText);
   const clear = useEditor((s) => s.clear);
   const hasLayers = useEditor((s) => s.layers.length > 0);
+  const photoCount = useEditor((s) => s.photoLibrary.length);
 
   const photoRef = useRef<HTMLInputElement>(null);
   const [popover, setPopover] = useState<Popover>(null);
@@ -22,7 +24,7 @@ export function Toolbar() {
     const file = e.target.files?.[0];
     if (!file) return;
     const { src, width, height } = await readImageFile(file);
-    setBaseImage(src, width, height);
+    setBaseImage(src, width, height, file.name);
     e.target.value = "";
   };
 
@@ -32,6 +34,17 @@ export function Toolbar() {
         🖼️ Upload photo
       </button>
       <input ref={photoRef} type="file" accept="image/*" hidden onChange={onPhoto} />
+
+      <div className="popover-anchor">
+        <button
+          className={"btn" + (popover === "photos" ? " btn-active" : "")}
+          onClick={() => toggle("photos")}
+          title="Reuse a photo from this session"
+        >
+          🕑 Recent{photoCount > 0 ? ` (${photoCount})` : ""}
+        </button>
+        {popover === "photos" && <PhotoLibrary onPick={() => setPopover(null)} />}
+      </div>
 
       <span className="toolbar-sep" />
 

@@ -5,6 +5,8 @@ import { measureImage, readImageFile } from "../lib/file";
 
 export function StickerPicker({ onPick }: { onPick: () => void }) {
   const addImageSticker = useEditor((s) => s.addImageSticker);
+  const uploads = useEditor((s) => s.stickerLibrary);
+  const removeSavedSticker = useEditor((s) => s.removeSavedSticker);
   const [items, setItems] = useState<StickerManifestEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -26,7 +28,8 @@ export function StickerPicker({ onPick }: { onPick: () => void }) {
     const file = e.target.files?.[0];
     if (!file) return;
     const { src, width, height } = await readImageFile(file);
-    addImageSticker(src, width, height, file.name);
+    // save=true → remembered in the session library for reuse.
+    addImageSticker(src, width, height, file.name, true);
     onPick();
   };
 
@@ -36,6 +39,39 @@ export function StickerPicker({ onPick }: { onPick: () => void }) {
   return (
     <div className="popover popover-wide">
       {error && <p className="muted">{error}</p>}
+
+      {uploads.length > 0 && (
+        <div className="sticker-cat">
+          <div className="sticker-cat-title">Your uploads</div>
+          <div className="sticker-grid">
+            {uploads.map((u) => (
+              <div key={u.id} className="photo-cell">
+                <button
+                  className="sticker-cell"
+                  title={`Add “${u.name}”`}
+                  onClick={() => {
+                    addImageSticker(u.src, u.width, u.height, u.name, true);
+                    onPick();
+                  }}
+                >
+                  <img src={u.src} alt={u.name} />
+                </button>
+                <button
+                  className="photo-remove"
+                  title="Remove from library"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeSavedSticker(u.id);
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {categories.map((cat) => (
         <div key={cat} className="sticker-cat">
           <div className="sticker-cat-title">{cat}</div>

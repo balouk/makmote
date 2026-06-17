@@ -6,18 +6,33 @@ import type {
   LaserColor,
   LaserLayer,
   Layer,
+  SavedPhoto,
   SignLayer,
   TextLayer,
 } from "../types";
+import {
+  loadLibrary,
+  loadStickers,
+  MAX_STICKERS,
+  saveLibrary,
+  saveStickers,
+  upsertPhoto,
+} from "../lib/photoStorage";
 
 export const CANVAS_SIZE = 512;
 
 let idCounter = 0;
 const nextId = (prefix: string) => `${prefix}-${++idCounter}`;
+const nextLibId = (prefix: string) =>
+  `${prefix}-${++idCounter}-${Math.floor(performance.now())}`;
 
 interface EditorState {
   layers: Layer[];
   selectedId: string | null;
+  /** photos uploaded this session, reusable as a base image */
+  photoLibrary: SavedPhoto[];
+  /** stickers uploaded this session, reusable from the sticker picker */
+  stickerLibrary: SavedPhoto[];
 
   select: (id: string | null) => void;
   update: (id: string, patch: Partial<Layer>) => void;
@@ -28,7 +43,14 @@ interface EditorState {
   /** z-order: move a layer up/down in the array (1 = toward top). */
   reorder: (id: string, direction: -1 | 1) => void;
 
-  setBaseImage: (src: string, naturalWidth: number, naturalHeight: number) => void;
+  setBaseImage: (
+    src: string,
+    naturalWidth: number,
+    naturalHeight: number,
+    name?: string
+  ) => void;
+  useSavedPhoto: (id: string) => void;
+  removeSavedPhoto: (id: string) => void;
   addLaser: (color?: LaserColor) => void;
   addSign: (text?: string) => void;
   addText: (text?: string) => void;
@@ -37,8 +59,11 @@ interface EditorState {
     src: string,
     naturalWidth: number,
     naturalHeight: number,
-    name?: string
+    name?: string,
+    /** when true, also remember the sticker in the session library */
+    save?: boolean
   ) => void;
+  removeSavedSticker: (id: string) => void;
 }
 
 const center = CANVAS_SIZE / 2;
@@ -53,11 +78,30 @@ const baseTransform = (type: Layer["type"], name: string, id: string) => ({
   scaleX: 1,
   scaleY: 1,
   rotation: 0,
+  opacity: 1,
+});
+
+/** Build the base layer from a source image (shared by upload + reuse). */
+const makeBase = (
+  src: string,
+  naturalWidth: number,
+  naturalHeight: number,
+  name: string
+): BaseImageLayer => ({
+  ...baseTransform("base", name, "base"),
+  type: "base",
+  src,
+  naturalWidth,
+  naturalHeight,
+  tintColor: "#ff0000",
+  tintStrength: 0,
 });
 
 export const useEditor = create<EditorState>((set, get) => ({
   layers: [],
   selectedId: null,
+  photoLibrary: loadLibrary(),
+  stickerLibrary: loadStickers(),
 
   select: (id) => set({ selectedId: id }),
 
@@ -102,20 +146,40 @@ export const useEditor = create<EditorState>((set, get) => ({
       return { layers };
     }),
 
-  setBaseImage: (src, naturalWidth, naturalHeight) =>
+  setBaseImage: (src, naturalWidth, naturalHeight, name = "Photo") =>
     set((s) => {
-      const base: BaseImageLayer = {
-        ...baseTransform("base", "Photo", "base"),
-        type: "base",
-        src,
-        naturalWidth,
-        naturalHeight,
-        // BaseImage component centers via offset; place at canvas center.
-        x: center,
-        y: center,
-      };
+      const base = makeBase(src, naturalWidth, naturalHeight, name);
       const rest = s.layers.filter((l) => l.type !== "base");
-      return { layers: [base, ...rest], selectedId: "base" };
+      // Remember the photo for reuse this session.
+      const photo: SavedPhoto = {
+        id: nextLibId("photo"),
+        name,
+        src,
+        width: naturalWidth,
+        height: naturalHeight,
+      };
+      const photoLibrary = upsertPhoto(s.photoLibrary, photo);
+      saveLibrary(photoLibrary);
+      return { layers: [base, ...rest], selectedId: "base", photoLibrary };
+    }),
+
+  useSavedPhoto: (id) =>
+    set((s) => {
+      const photo = s.photoLibrary.find((p) => p.id === id);
+      if (!photo) return s;
+      const base = makeBase(photo.src, photo.width, photo.height, photo.name);
+      const rest = s.layers.filter((l) => l.type !== "base");
+      // Move the reused photo to the front of the library.
+      const photoLibrary = upsertPhoto(s.photoLibrary, photo);
+      saveLibrary(photoLibrary);
+      return { layers: [base, ...rest], selectedId: "base", photoLibrary };
+    }),
+
+  removeSavedPhoto: (id) =>
+    set((s) => {
+      const photoLibrary = s.photoLibrary.filter((p) => p.id !== id);
+      saveLibrary(photoLibrary);
+      return { photoLibrary };
     }),
 
   addLaser: (color = "red") => {
@@ -170,7 +234,7 @@ export const useEditor = create<EditorState>((set, get) => ({
     set((s) => ({ layers: [...s.layers, e], selectedId: id }));
   },
 
-  addImageSticker: (src, naturalWidth, naturalHeight, name = "Sticker") => {
+  addImageSticker: (src, naturalWidth, naturalHeight, name = "Sticker", save = false) => {
     const id = nextId("image");
     // Fit sticker to ~40% of the canvas on its longest side.
     const target = CANVAS_SIZE * 0.4;
@@ -184,6 +248,24 @@ export const useEditor = create<EditorState>((set, get) => ({
       scaleX: scale,
       scaleY: scale,
     };
-    set((s) => ({ layers: [...s.layers, img], selectedId: id }));
+    set((s) => {
+      let stickerLibrary = s.stickerLibrary;
+      if (save) {
+        stickerLibrary = upsertPhoto(
+          s.stickerLibrary,
+          { id: nextLibId("usticker"), name, src, width: naturalWidth, height: naturalHeight },
+          MAX_STICKERS
+        );
+        saveStickers(stickerLibrary);
+      }
+      return { layers: [...s.layers, img], selectedId: id, stickerLibrary };
+    });
   },
+
+  removeSavedSticker: (id) =>
+    set((s) => {
+      const stickerLibrary = s.stickerLibrary.filter((p) => p.id !== id);
+      saveStickers(stickerLibrary);
+      return { stickerLibrary };
+    }),
 }));

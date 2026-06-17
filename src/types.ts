@@ -14,6 +14,8 @@ export interface BaseTransform {
   scaleX: number;
   scaleY: number;
   rotation: number;
+  /** layer transparency, 0–1 */
+  opacity: number;
 }
 
 /** The uploaded photo. There is at most one base layer, always at the bottom. */
@@ -23,6 +25,10 @@ export interface BaseImageLayer extends BaseTransform {
   /** natural pixel size of the source image, used for fit-to-canvas math */
   naturalWidth: number;
   naturalHeight: number;
+  /** color tint washed over the photo (e.g. red for the laser-eyes vibe) */
+  tintColor: string;
+  /** strength of the tint, 0–1 (0 = none) */
+  tintStrength: number;
 }
 
 export type LaserColor = "red" | "green" | "blue" | "pink";
@@ -82,4 +88,13 @@ export interface StickerManifestEntry {
   name: string;
   category: string;
   src: string;
+}
+
+/** A photo kept in the session library so it can be reused as a base. */
+export interface SavedPhoto {
+  id: string;
+  name: string;
+  src: string; // data URL
+  width: number;
+  height: number;
 }

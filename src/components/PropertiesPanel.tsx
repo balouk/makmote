@@ -153,7 +153,39 @@ export function PropertiesPanel() {
         </Row>
       )}
 
-      {/* Rotation applies to every layer type. */}
+      {layer.type === "base" && (
+        <>
+          <Row label="Red tint">
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={Math.round(layer.tintStrength * 100)}
+              onChange={(e) =>
+                set({ tintStrength: Number(e.target.value) / 100 })
+              }
+            />
+          </Row>
+          <Row label="Tint color">
+            <input
+              type="color"
+              value={layer.tintColor}
+              onChange={(e) => set({ tintColor: e.target.value })}
+            />
+          </Row>
+        </>
+      )}
+
+      {/* Opacity & rotation apply to every layer type. */}
+      <Row label="Opacity">
+        <input
+          type="range"
+          min={0}
+          max={100}
+          value={Math.round((layer.opacity ?? 1) * 100)}
+          onChange={(e) => set({ opacity: Number(e.target.value) / 100 })}
+        />
+      </Row>
       <Row label="Rotation">
         <input
           type="range"

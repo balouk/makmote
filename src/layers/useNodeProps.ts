@@ -33,6 +33,7 @@ export function useNodeProps(layer: Layer) {
     name: "layer",
     draggable: true,
     visible: layer.visible,
+    opacity: layer.opacity ?? 1,
     x: layer.x,
     y: layer.y,
     rotation: layer.rotation,
